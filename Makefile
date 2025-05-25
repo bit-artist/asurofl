@@ -1,26 +1,27 @@
+# asurofl - simple asuro flash tool
+.POSIX:
+
 CC = gcc
-CFLAGS = -Os -c -pedantic -Wall
-SRC = src
-PROJECT = asurofl
-OBJECT_FILES = main.o util.o crc.o
+CFLAGS = -Os -pedantic -Wall
+BIN = asurofl
+OBJECTS = main.o util.o crc.o
 
-all: $(OBJECT_FILES)
-	$(CC) -o $(PROJECT) $(OBJECT_FILES)
-	size $(PROJECT)
+all: $(BIN) size
 
-main.o: $(SRC)/main.c $(SRC)/util.h
-	$(CC) $(CFLAGS) -o main.o $(SRC)/main.c
-	
-util.o: $(SRC)/util.c $(SRC)/util.h $(SRC)/crc.h
-	$(CC) $(CFLAGS) -o util.o $(SRC)/util.c
+$(BIN): $(OBJECTS)
+	$(CC) -o $@ $^
 
-crc.o: $(SRC)/crc.c $(SRC)/crc.h
-	$(CC) $(CFLAGS) -o crc.o $(SRC)/crc.c
+size: $(BIN)
+	size $<
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+main.o: main.c util.h
+util.o: util.c util.h crc.h
+crc.o: crc.c crc.h
 
 clean:
-	-rm $(PROJECT) $(OBJECT_FILES)
+	rm -f $(BIN) $(OBJECTS)
 
-
-# targets that do not refer to files but are just actions
-# are called phony targets
-.PHONY: clean
+.PHONY: all size clean
